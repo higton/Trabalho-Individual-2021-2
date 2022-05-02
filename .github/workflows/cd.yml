@@ -1,0 +1,28 @@
+name: CD
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: 
+      - main
+
+defaults:
+  run:
+    working-directory: ./aplicacao
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Logging in
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - uses: actions/checkout@v3
+      - name: Creating Image
+        run: docker-compose build app
+      - name: Pushing Image
+        run: docker-compose push app

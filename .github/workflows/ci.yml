@@ -1,0 +1,36 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: 
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Building app
+        working-directory: ./aplicacao
+        run: docker-compose up -d
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepareing for tests
+        working-directory: ./aplicacao
+        run: docker-compose run app rails db:reset
+      - name: Runing tests
+        working-directory: ./aplicacao
+        run: docker-compose run app rspec
+    
+  lint: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Runing Lint check
+        working-directory: ./aplicacao
+        run: docker-compose run app bash -c "gem install rubocop; rubocop --only Style/TrailingCommaInHashLiteral"
